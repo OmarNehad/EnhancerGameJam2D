@@ -15,7 +15,7 @@ public class Building : MonoBehaviour
 
     public int demaningScore = 10;
     public Text demaningScoreText;
-
+    private AudioSource audioSource;
 
 //    public int redScore = 0;
 
@@ -32,10 +32,12 @@ public class Building : MonoBehaviour
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         demaningScoreText.text = demaningScore.ToString();
         startingPos = transform.position;
         BuildingSpriteRend = GetComponent<SpriteRenderer>();
         tilemap = GameObject.Find("Tilemap").GetComponent<Tilemap>();
+        countText.text = count.ToString();
     }
 
 
@@ -78,10 +80,17 @@ public class Building : MonoBehaviour
                     //newTile.sprite = BuildingSprite; // set the sprite of the new Tile to the new sprite you want to use
                     //tilemap.SetTile(gridPosition, newTile); // set the new Tile at the position of the tile you want to change
 
-
-                    Tile newTile = Instantiate((tilemap.GetTile(gridPosition) as Tile));
+                    Tile oldTile = (tilemap.GetTile(gridPosition) as Tile);
+                    if (oldTile.name == "taken")
+                    {
+                        transform.position = startingPos;
+                        return;
+                            };
+                    Tile newTile = Instantiate(oldTile);
                     newTile.sprite = BuildingSpriteRend.sprite;
+                    newTile.name = "taken";
                     tilemap.SetTile(gridPosition, newTile);
+                    audioSource.Play();
 
                     //if (clickedTile.sprite.name == "Water_Back") { transform.position = startingPos; return; }
 
@@ -108,6 +117,7 @@ public class Building : MonoBehaviour
 
 
                 }
+
                 transform.position = startingPos;
             }
 
@@ -121,6 +131,8 @@ public class Building : MonoBehaviour
         {
             // Update the position of the sprite while it's being dragged
             transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + offset;
+            //transform.position = mousePosition;
+
         }
 
 
